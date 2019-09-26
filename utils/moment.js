@@ -33,7 +33,10 @@ exports.monthInit = signDate => {
     hasSign: false,
   };
   const days = new Date(year, month, 0).getDate();
-  const INITARRAY = [...Array(days)].map(_ => signDayInfo);
+  const INITARRAY = [...Array(days)].map((_, index) => ({
+    signDay: Number(moment().date(index + 1).format('YYYYMMDD')),
+    ...signDayInfo
+  }));
   for (const i of signDate) {
     const splitIndex = Number(i.signDay.toString().substr(-2)) - 1;
     INITARRAY.splice(splitIndex, 1, {

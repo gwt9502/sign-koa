@@ -25,7 +25,7 @@ app.use(async (ctx, next) => {
     if (err.status === 401) {
       ctx.body = {
         code: 401,
-        message: '暂无权限'
+        message: '暂未登录'
       }
     } else {
       ctx.body = err;

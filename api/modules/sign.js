@@ -1,8 +1,7 @@
 const Router = require('koa-router');
 const mongoose = require('mongoose');
-const { yearWithMonthAndDay, yearWithMonth, monthInit } = require('../../utils/moment');
-const { getUserInfo } = require('../../utils/user');
-const { getSignList } = require('../../utils/sign');
+const { monthInit } = require('../../utils/moment');
+const { getSignList, getSignState } = require('../../utils/sign');
 
 const router = new Router();
 
@@ -10,43 +9,30 @@ const router = new Router();
  * 签到
  */
 router.post('/sign', async ctx => {
-  await getUserInfo(ctx)
+  await getSignState(ctx)
   .then(async user => {
-    if (user) {
-      const SignModel = mongoose.model('Sign');
-      await SignModel.findOne({
-        userId: user._id,
-        signDay: yearWithMonthAndDay(),
-      })
-      .then(async signDate => {
-        if (signDate) {
-          return ctx.body = {
-            code: 400,
-            message: '今日已签到'
-          }
-        } else {
-          await SignModel({
-            userId: user._id,
-            userName: user.userName
-          }).save()
-          .then(() => {
-            return ctx.body = {
-              code: 200,
-              message: '签到成功'
-            }
-          })
-          .catch(err => {
-            console.log(`签到失败${err}`);
-          });
-        }
-      })
-    } else {
+    const SignModel = mongoose.model('Sign');
+    await SignModel({
+      userId: user._id,
+      userName: user.userName,
+      signDay: ctx.request.body.signDay,
+    }).save()
+    .then(() => {
       return ctx.body = {
-        code: 400,
-        message: '没有该用户'
+        code: 200,
+        message: '签到成功'
       }
-    }
+    })
+    .catch(err => {
+      console.log(`签到失败${err}`);
+    });
   })
+  .catch(err => {
+    return ctx.body = {
+      code: 400,
+      message: err,
+    }
+  });
 });
 
 /**

@@ -26,5 +26,6 @@ const signSchema = new Schema({
  * 创建复合索引
  */
 signSchema.index({userId: 1, month: 1});
+signSchema.index({userId: 1, signDay: 1});
 
 mongoose.model('Sign', signSchema);
